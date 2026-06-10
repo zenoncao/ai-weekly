@@ -1,0 +1,98 @@
+---
+import { issues, type Issue } from "../../data/issues";
+import "../../styles/global.css";
+
+export function getStaticPaths() {
+  return issues.map((issue) => ({
+    params: { slug: issue.slug },
+    props: { issue },
+  }));
+}
+
+type Props = { issue: Issue };
+
+const { issue } = Astro.props;
+const categories = Array.from(new Set(issue.articles.map((article) => article.category)));
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{issue.title} | AI 优秀博客周刊</title>
+    <meta name="description" content={issue.deck} />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">AI Weekly</a>
+      <nav aria-label="归档">
+        {issues.map((item) => <a class={item.slug === issue.slug ? "active" : ""} href={`/issues/${item.slug}/`}>{item.date}</a>)}
+      </nav>
+    </header>
+
+    <main>
+      <article class="issue-page">
+        <header class="issue-hero">
+          <p class="eyebrow">ISSUE {issue.slug}</p>
+          <h1>{issue.title}</h1>
+          <p class="deck">{issue.deck}</p>
+          <div class="issue-meta">
+            <span>{issue.range}</span>
+            <span>{issue.articles.length} 篇</span>
+            <span>按时间累积归档</span>
+          </div>
+        </header>
+
+        <section class="editorial">
+          <p>{issue.editorial}</p>
+        </section>
+
+        <nav class="category-nav" aria-label="本期分类">
+          {categories.map((category) => (
+            <a href={`#${category}`}>{category}</a>
+          ))}
+        </nav>
+
+        {categories.map((category) => (
+          <section class="article-section" id={category} aria-labelledby={`${category}-title`}>
+            <div class="section-heading">
+              <p class="eyebrow">SECTION</p>
+              <h2 id={`${category}-title`}>{category}</h2>
+            </div>
+            <div class="article-grid">
+              {issue.articles
+                .filter((article) => article.category === category)
+                .map((article) => (
+                  <article class="article-card" data-category={article.category}>
+                    <div class="article-topline">
+                      <span>{article.source}</span>
+                      <span>{article.date}</span>
+                    </div>
+                    <h3>
+                      <a href={article.url} target="_blank" rel="noreferrer">
+                        {article.title}
+                      </a>
+                    </h3>
+                    <p class="byline">{article.author}</p>
+                    <p>{article.summary}</p>
+                    <div class="article-notes">
+                      <p><strong>为什么值得读：</strong>{article.why}</p>
+                      <p><strong>适合谁：</strong>{article.audience}</p>
+                      <p><strong>事实/观点/推断：</strong>{article.factOpinionInference}</p>
+                    </div>
+                    <div class="tag-row">
+                      {article.tags.map((tag) => <span>{tag}</span>)}
+                    </div>
+                    <div class="rating-row">
+                      <span>信号 {article.signal}</span>
+                      <span>置信 {article.confidence}</span>
+                    </div>
+                  </article>
+                ))}
+            </div>
+          </section>
+        ))}
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+---
+import { issues, latestIssue } from "../data/issues";
+import "../styles/global.css";
+
+const categories = Array.from(new Set(latestIssue.articles.map((article) => article.category)));
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 优秀博客周刊</title>
+    <meta
+      name="description"
+      content="按周归档的前沿 AI 高质量博客、研究、工程和产品文章精选。"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">AI Weekly</a>
+      <nav aria-label="归档">
+        {issues.map((issue) => <a href={`/issues/${issue.slug}/`}>{issue.date}</a>)}
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">ISSUE {latestIssue.slug}</p>
+          <h1>{latestIssue.title}</h1>
+          <p class="deck">{latestIssue.deck}</p>
+          <div class="hero-actions">
+            <a class="primary-link" href={`/issues/${latestIssue.slug}/`}>阅读本期</a>
+            <span>{latestIssue.range}</span>
+          </div>
+        </div>
+        <aside class="signal-board" aria-label="本期结构">
+          {categories.map((category) => (
+            <a href={`/issues/${latestIssue.slug}/#${category}`} class="signal-pill">
+              <span>{category}</span>
+              <strong>
+                {latestIssue.articles.filter((article) => article.category === category).length}
+              </strong>
+            </a>
+          ))}
+        </aside>
+      </section>
+
+      <section class="issue-strip" aria-labelledby="archive-title">
+        <div class="section-heading">
+          <p class="eyebrow">ARCHIVE</p>
+          <h2 id="archive-title">历史周刊</h2>
+        </div>
+        <div class="archive-grid">
+          {issues.map((issue) => (
+            <a class="issue-card" href={`/issues/${issue.slug}/`}>
+              <span>{issue.date}</span>
+              <h3>{issue.title}</h3>
+              <p>{issue.editorial}</p>
+              <strong>{issue.articles.length} 篇精选</strong>
+            </a>
+          ))}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
